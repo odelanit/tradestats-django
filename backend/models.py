@@ -31,14 +31,13 @@ class InstrumentMaster(models.Model):
 
 class InstrumentMasterAdmin(admin.ModelAdmin):
     list_display = (
+        'instrument_id',
         'exchange_segment',
         'exchange_instrument_id',
         'instrument_type',
         'name',
-        'description',
         'series',
-        'name_with_series',
-        'instrument_id',
+        'description',
         'price_band_high',
         'price_band_low',
         'freeze_qty',
