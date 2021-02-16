@@ -11,8 +11,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         response = requests.post('https://ttblaze.iifl.com/apimarketdata/auth/login', data={
-            'secretKey': 'Sffp502@P0',
-            'appKey': 'b30ec8206bc86949584481',
+            'secretKey': os.environ.get('BLAZE_SECRET_KEY', ''),
+            'appKey': os.environ.get('BLAZE_APP_KEY', ''),
             "source": "WebAPI"
         })
         data = response.json()
