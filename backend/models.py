@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db import models
+from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 
 class InstrumentMaster(models.Model):
@@ -48,6 +49,11 @@ class InstrumentMasterAdmin(admin.ModelAdmin):
         'contract_expiration',
         'strike_price',
         'option_type'
+    )
+    list_filter = (
+        ('exchange_segment', DropdownFilter),
+        ('instrument_type', DropdownFilter),
+        ('series', DropdownFilter)
     )
 
 
