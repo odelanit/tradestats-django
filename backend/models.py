@@ -1,6 +1,5 @@
 import csv
 import io
-from decimal import Decimal
 
 from django import forms
 from django.contrib import admin
