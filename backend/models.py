@@ -61,6 +61,12 @@ class InstrumentMasterAdmin(admin.ModelAdmin):
         ('instrument_type', DropdownFilter),
         ('series', DropdownFilter)
     )
+    search_fields = [
+        'instrument_id',
+        'exchange_instrument_id',
+        'name',
+        'description'
+    ]
 
 
 class IndexConstituent(models.Model):
