@@ -87,14 +87,26 @@ class CsvImportForm(forms.Form):
 
 
 class IndexConstituentAdmin(admin.ModelAdmin):
-    change_list_template = "admin/entities/index_constituent_changelist.html"
     list_display = (
-        'index',
         'symbol',
+        'index',
         'company_name',
         'sector',
         'weightage',
     )
+
+    search_fields = [
+        'symbol',
+        'company_name',
+        'sector',
+    ]
+
+    list_filter = (
+        ('index', DropdownFilter),
+    )
+
+    change_list_template = "admin/entities/index_constituent_changelist.html"
+
 
     def get_urls(self):
         urls = super().get_urls()
