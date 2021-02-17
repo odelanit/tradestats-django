@@ -1,5 +1,12 @@
+import csv
+import io
+from decimal import Decimal
+
+from django import forms
 from django.contrib import admin
 from django.db import models
+from django.shortcuts import redirect
+from django.urls import path
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 
@@ -58,11 +65,11 @@ class InstrumentMasterAdmin(admin.ModelAdmin):
 
 
 class IndexConstituent(models.Model):
-    index = models.CharField(primary_key=True, max_length=255)
     symbol = models.CharField(max_length=255)
-    company_name = models.CharField(max_length=255)
-    sector = models.CharField(max_length=255)
-    weightage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    index = models.CharField(primary_key=True, max_length=255)
+    company_name = models.CharField(max_length=255, blank=True, null=True)
+    sector = models.CharField(max_length=255, blank=True, null=True)
+    weightage = models.DecimalField(max_digits=5, decimal_places=4, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -70,7 +77,12 @@ class IndexConstituent(models.Model):
         unique_together = (('index', 'symbol', 'company_name', 'sector'),)
 
 
+class CsvImportForm(forms.Form):
+    csv_file = forms.FileField(widget=forms.FileInput(attrs={'accept': "text/csv,.csv"}))
+
+
 class IndexConstituentAdmin(admin.ModelAdmin):
+    change_list_template = "admin/entities/index_constituent_changelist.html"
     list_display = (
         'index',
         'symbol',
@@ -78,3 +90,38 @@ class IndexConstituentAdmin(admin.ModelAdmin):
         'sector',
         'weightage',
     )
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('import-csv/', self.import_csv),
+        ]
+        return my_urls + urls
+
+    def import_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            data_set = csv_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            next(io_string)
+            reader = csv.reader(io_string)
+
+            for row in reader:
+                print(row)
+                try:
+                    ic = IndexConstituent.objects.get(symbol=row[1], index=row[0])
+                    ic.company_name = row[2] if row[2] else None
+                    ic.sector = row[3] if row[3] else None
+                    ic.weightage = row[4] if row[4] else None
+                    ic.save()
+                except IndexConstituent.DoesNotExist:
+                    ic = IndexConstituent.objects.create(
+                        index=row[0],
+                        symbol=row[1],
+                        company_name=row[2] if row[2] else None,
+                        sector=row[3] if row[3] else None,
+                        weightage=row[4] if row[4] else None
+                    )
+
+            self.message_user(request, "Your csv file has been imported")
+            return redirect("..")

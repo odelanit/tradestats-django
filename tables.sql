@@ -27,6 +27,6 @@ create table if not exists index_constituents
     symbol       varchar(255),
     company_name varchar(255),
     sector       varchar(255),
-    weightage    decimal(5, 2),
-    primary key (index, symbol, company_name, sector)
+    weightage    decimal(5, 4),
+    primary key (index, symbol)
 );
